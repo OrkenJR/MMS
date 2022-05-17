@@ -11,14 +11,17 @@ public interface MedicineService {
 
     List<Medicine> findAllMedicine();
     List<Treatment> findAllTreatment();
+    List<Disease> findAllDisease();
     List<Treatment> findAllTreatmentByUser(User user);
-    List<Treatment> findAllTreatmentByDisease(Disease disease);
+    List<Treatment> findAllTreatmentByDisease(String disease);
+    Disease findDiseaseByName(String name);
+    Medicine findMedicineByName(String name);
     Treatment setTreatment(User patient, Disease disease);
-    void buyMedicine(Medicine medicine);
+    void buyMedicine(String medicine);
     Disease saveDisease(Disease disease);
     Medicine saveMedicine(Medicine medicine);
-    void delete(Disease disease);
-    void delete(Medicine medicine);
+    void deleteDisease(Long disease);
+    void deleteMedicine(Long medicine);
 
     boolean isTreatmentFinished(Treatment treatment);
     byte[] exportTreatment();

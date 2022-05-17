@@ -35,8 +35,8 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/").authenticated().and().httpBasic()
+                .authorizeRequests().antMatchers(HttpMethod.DELETE).hasAuthority(Role.ADMIN_ROLE)
+                .antMatchers("/").hasAnyAuthority(Role.ADMIN_ROLE, Role.DOCTOR_ROLE, Role.CUSTOMER_ROLE).and().httpBasic()
                 .and().authorizeRequests().anyRequest().permitAll()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().disable();
 

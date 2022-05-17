@@ -12,6 +12,8 @@ import java.util.List;
 public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
     List<Medicine> findAllByPriceBetweenOrderById(Long start, Long end);
+    Medicine findMedicineByName(String name);
+    Medicine findMedicineById(Long id);
 
 //    @Query("")
 //    boolean doesHealDisease(Disease disease);

@@ -1,18 +1,22 @@
 package kz.iitu.orken.medical_managament_system.entity;
 
-import kz.iitu.orken.medical_managament_system.entity.user.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedBy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@ToString(exclude = {"diseases"})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Medicine {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,7 +27,8 @@ public class Medicine {
     private String name;
 
     private Long price;
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "diseases_medicine",
             joinColumns = @JoinColumn(
@@ -31,4 +36,9 @@ public class Medicine {
             inverseJoinColumns = @JoinColumn(
                     name = "disease_id", referencedColumnName = "id"))
     private Set<Disease> diseases;
+
+    public Medicine(String name, Long price) {
+        this.name = name;
+        this.price = price;
+    }
 }

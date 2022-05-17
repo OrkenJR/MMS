@@ -24,10 +24,8 @@ public class CustomEntryPoint extends BasicAuthenticationEntryPoint {
 
     @Override
     public void afterPropertiesSet() {
-        // RealmName appears in the login window (Firefox).
-        setRealmName("o7planning");
+        setRealmName("realm");
         super.afterPropertiesSet();
     }
-
 
 }

@@ -23,6 +23,7 @@ public class Role {
 
     public static final String DOCTOR_ROLE = "doctor";
     public static final String ADMIN_ROLE = "admin";
+    public static final String CUSTOMER_ROLE = "customer";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

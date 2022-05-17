@@ -78,10 +78,10 @@ public class UserServiceImpl implements UserService {
     public User randomDoctor() {
         Random rand = new Random();
         List<User> allUsers = findAll();
-        return allUsers.stream()
+        List<User> doctors = allUsers.stream()
                 .filter(x -> containsName(x.getRoles(), Role.DOCTOR_ROLE))
-                .collect(Collectors.toList())
-                .get(rand.nextInt(allUsers.size()));
+                .collect(Collectors.toList());
+        return doctors.get(rand.nextInt(doctors.size()));
     }
 
     @Override
@@ -136,27 +136,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void makeAppointment(Treatment treatment) {
-
-    }
-
-    @Override
-    public void finishAppointment(Treatment treatment) {
-
-    }
-
-    @Override
     public byte[] export() {
         return new byte[0];
     }
 
     public boolean containsName(final Set<Role> list, final String name) {
-        return list.stream().filter(o -> o.getName().equals(name)).findFirst().isPresent();
+        return list.stream().anyMatch(o -> o.getName().equals(name));
     }
 
     @Scheduled(fixedDelay = 60000 * 60 * 12, initialDelay = 60000 * 60 * 12) // every 12 hours
     public void evictAllCaches() {
-
         List<String> caches = Arrays.asList("user-by-username", "all-users");
         caches.forEach(cacheName -> {
             Objects.requireNonNull(cacheManager.getCache(cacheName)).clear();

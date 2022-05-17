@@ -1,6 +1,7 @@
 package kz.iitu.orken.medical_managament_system.service.impl;
 
 import kz.iitu.orken.medical_managament_system.Exception.NotAllowedException;
+import kz.iitu.orken.medical_managament_system.Exception.NotFoundException;
 import kz.iitu.orken.medical_managament_system.Exception.TransactionException;
 import kz.iitu.orken.medical_managament_system.aop.LogAnnotation;
 import kz.iitu.orken.medical_managament_system.entity.Disease;
@@ -10,7 +11,6 @@ import kz.iitu.orken.medical_managament_system.entity.user.User;
 import kz.iitu.orken.medical_managament_system.repository.DiseaseRepository;
 import kz.iitu.orken.medical_managament_system.repository.MedicineRepository;
 import kz.iitu.orken.medical_managament_system.repository.TreatmentRepository;
-import kz.iitu.orken.medical_managament_system.repository.UserRepository;
 import kz.iitu.orken.medical_managament_system.service.MedicineService;
 import kz.iitu.orken.medical_managament_system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +18,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Service
 public class MedicineServiceImpl implements MedicineService {
 
     private DiseaseRepository diseaseRepository;
@@ -73,6 +70,11 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
+    public List<Disease> findAllDisease() {
+        return diseaseRepository.findAll();
+    }
+
+    @Override
     @Cacheable(value = "treatment-by-user", key = "#user.username + '::treatment'")
     @Transactional(propagation = Propagation.NEVER, readOnly = true, isolation = Isolation.REPEATABLE_READ,
             rollbackFor = TransactionException.class,
@@ -84,7 +86,7 @@ public class MedicineServiceImpl implements MedicineService {
                 .collect(Collectors.toList());
     }
 
-    @Override
+
     @Cacheable(value = "treatment-by-disease", key = "#disease.id + '::disease'")
     @Transactional(propagation = Propagation.NEVER, readOnly = true, isolation = Isolation.REPEATABLE_READ)
     public List<Treatment> findAllTreatmentByDisease(Disease disease) {
@@ -95,7 +97,31 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
+    public Disease findDiseaseByName(String name) {
+        return diseaseRepository.findDiseaseByName(name);
+    }
+
+    @Override
+    public Medicine findMedicineByName(String name) {
+        return medicineRepository.findMedicineByName(name);
+    }
+
+    @Override
+    public List<Treatment> findAllTreatmentByDisease(String name) {
+
+        Disease disease = diseaseRepository.findDiseaseByName(name);
+        if (disease != null) {
+            return findAllTreatmentByDisease(disease);
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
     public Treatment setTreatment(User patient, Disease disease) {
+        Disease disease1 = findDiseaseByName(disease.getName());
+        if (disease1 == null) {
+            disease = saveDisease(disease);
+        }
         return Treatment
                 .builder()
                 .patient(patient)
@@ -108,7 +134,13 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Override
     @Transactional(propagation = Propagation.NEVER, readOnly = true, isolation = Isolation.SERIALIZABLE)
-    public void buyMedicine(Medicine medicine) {
+    public void buyMedicine(String medicineName) {
+
+        Medicine medicine = findMedicineByName(medicineName);
+        if (medicine == null) {
+            throw new NotFoundException("Could not found medicine by name: " + medicineName);
+        }
+
         User user = userService.getCurrentUser();
         int size = (int) user.getTreatmentsAsPatient().stream().filter(x -> x.getDisease().getMedicines().contains(medicine)).count();
         if (size == 0) {
@@ -128,21 +160,24 @@ public class MedicineServiceImpl implements MedicineService {
     @CacheEvict(value = "all-medicine")
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, isolation = Isolation.SERIALIZABLE)
     public Medicine saveMedicine(Medicine medicine) {
+        diseaseRepository.saveAll(medicine.getDiseases());
         return medicineRepository.save(medicine);
     }
 
     @Override
-    @CacheEvict(value = "treatment-by-disease", key = "#disease.id + '::disease'")
+    @CacheEvict(value = "treatment-by-disease")
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, isolation = Isolation.SERIALIZABLE)
-    public void delete(Disease disease) {
-        diseaseRepository.delete(disease);
+    public void deleteDisease(Long diseaseId) {
+        Disease disease = diseaseRepository.findDiseaseById(diseaseId);
+        Optional.ofNullable(disease).ifPresent(diseaseRepository::delete);
     }
 
     @Override
     @CacheEvict(value = "all-medicine")
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, isolation = Isolation.SERIALIZABLE)
-    public void delete(Medicine medicine) {
-        medicineRepository.delete(medicine);
+    public void deleteMedicine(Long medicineId) {
+        Medicine medicine = medicineRepository.findMedicineById(medicineId);
+        Optional.ofNullable(medicine).ifPresent(medicineRepository::delete);
     }
 
     @Override

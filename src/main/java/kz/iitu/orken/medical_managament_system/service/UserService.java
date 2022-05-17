@@ -19,8 +19,6 @@ public interface UserService {
     void deleteById(Long id);
     void deleteRole(User user, List<String> roles);
     void report(String message);
-    void makeAppointment(Treatment treatment);
-    void finishAppointment(Treatment treatment);
     byte[] export();
 
 }

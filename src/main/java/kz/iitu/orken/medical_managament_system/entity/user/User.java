@@ -44,6 +44,7 @@ public class User {
     @NotNull
 //    @Size(min = 8, max = 140)
     @LastModifiedBy
+    @JsonIgnore
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
