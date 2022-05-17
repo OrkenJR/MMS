@@ -11,11 +11,13 @@ public interface UserService {
 
     List<User> findAll();
     User findByUsername(String username);
+    User findById(Long id);
     User save(User user);
     User randomDoctor();
     User getCurrentUser();
     void delete(User user);
-    void deleteRole(User user, List<Role> roles);
+    void deleteById(Long id);
+    void deleteRole(User user, List<String> roles);
     void report(String message);
     void makeAppointment(Treatment treatment);
     void finishAppointment(Treatment treatment);

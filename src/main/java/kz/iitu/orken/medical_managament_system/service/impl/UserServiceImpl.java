@@ -57,11 +57,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findById(Long id) {
+        return userRepository.findUserById(id);
+    }
+
+    @Override
     @Caching(evict = {
             @CacheEvict("all-users"),
             @CacheEvict(value = "user-by-username", key = "#user.username")
     })
     public User save(User user) {
+        user.setRoles(Collections.singleton(roleRepository.findByName(Role.DOCTOR_ROLE)));
         return userRepository.save(user);
     }
 
@@ -98,11 +104,19 @@ public class UserServiceImpl implements UserService {
             @CacheEvict("all-users"),
             @CacheEvict(value = "user-by-username", key = "#user.username")
     })
-    @Transactional(propagation = Propagation.REQUIRES_NEW,
+    @Transactional(propagation = Propagation.SUPPORTS,
             rollbackFor = TransactionException.class,
             noRollbackForClassName = {"NullpointerException", "NotAllowedException", "RuntimeException"})
     public void delete(User user) {
-        userRepository.delete(user);
+        if(user!=null){
+            userRepository.delete(user);
+        }
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        User user = findById(id);
+        Optional.ofNullable(user).ifPresent(this::delete);
     }
 
     @Override
@@ -110,9 +124,9 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.NESTED,
             rollbackFor = TransactionException.class,
             noRollbackForClassName = {"NullpointerException", "NotAllowedException", "RuntimeException"})
-    public void deleteRole(User user, List<Role> roles) {
+    public void deleteRole(User user, List<String> roles) {
         List<Role> userRoles = new ArrayList<>(user.getRoles());
-        user.setRoles(userRoles.stream().filter(x -> !roles.contains(x)).collect(Collectors.toSet()));
+        user.setRoles(userRoles.stream().filter(x -> !roles.contains(x.getName())).collect(Collectors.toSet()));
         userRepository.save(user);
     }
 

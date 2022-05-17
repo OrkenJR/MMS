@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -16,11 +17,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
+
+    private CustomAuthProvider authProvider;
+
+    @Autowired
+    public BasicAuthConfig(CustomAuthProvider authProvider){
+        this.authProvider = authProvider;
+    }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsServiceBean()).;
+        auth.authenticationProvider(this.authProvider);
     }
 
     @Override
@@ -31,18 +40,19 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests().anyRequest().permitAll()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().disable();
 
+//        http.authorizeRequests().antMatchers("/").authenticated().and().httpBasic();
 
     }
 
-    @Override
-    @Bean
-    public UserDetailsService userDetailsServiceBean() throws Exception {
-        return new UserDetailsServiceImpl();
-    }
-
+//    @Override
 //    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
+//    public UserDetailsService userDetailsServiceBean() throws Exception {
+//        return new UserDetailsServiceImpl();
 //    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 }

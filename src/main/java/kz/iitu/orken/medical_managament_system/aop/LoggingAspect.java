@@ -13,10 +13,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
 
 @Aspect
 @Component
@@ -62,7 +59,7 @@ public class LoggingAspect {
         StringJoiner message = new StringJoiner(" ")
                 .add("Finished").add(methodName).add("method");
         message.add("in").add(duration);
-        message.add("with return:").add(result.toString());
+        message.add("with return:").add(Optional.ofNullable(result).orElse("Nullpointerexception").toString());
         return message.toString();
     }
 
