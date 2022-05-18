@@ -1,10 +1,7 @@
 package kz.iitu.orken.medical_managament_system.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 
 import javax.persistence.*;
@@ -15,8 +12,10 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
 @ToString(exclude = {"diseases"})
 @JsonIgnoreProperties(ignoreUnknown = true)
+@AllArgsConstructor
 public class Medicine {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
