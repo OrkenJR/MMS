@@ -133,3 +133,9 @@ curl --location --request GET 'localhost:8080/medicine/listTreatment/excel' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Basic YWRtaW46dGVzdA=='
 
+### Finishing treatment
+curl --location --request PUT 'localhost:8080/medicine/finishTreatment/16?price=135000' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic ZG9jdG9yOnRlc3Q=' \
+--data-raw '"67% of his lunges was suffered from Pneumonia, fortunately we healed him"'
+

@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,12 +22,12 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
     private CustomAuthProvider authProvider;
 
     @Autowired
-    public BasicAuthConfig(CustomAuthProvider authProvider){
+    public BasicAuthConfig(CustomAuthProvider authProvider) {
         this.authProvider = authProvider;
     }
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(this.authProvider);
     }
 
@@ -43,12 +42,6 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
 //        http.authorizeRequests().antMatchers("/").authenticated().and().httpBasic();
 
     }
-
-//    @Override
-//    @Bean
-//    public UserDetailsService userDetailsServiceBean() throws Exception {
-//        return new UserDetailsServiceImpl();
-//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

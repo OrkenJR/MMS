@@ -15,7 +15,5 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
     Medicine findMedicineByName(String name);
     Medicine findMedicineById(Long id);
 
-//    @Query("")
-//    boolean doesHealDisease(Disease disease);
 
 }

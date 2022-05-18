@@ -18,6 +18,7 @@ public interface MedicineService {
     Disease findDiseaseByName(String name);
     Medicine findMedicineByName(String name);
     Treatment setTreatment(User patient, Disease disease);
+    Treatment updateTreatment(String description, Long price, Long id);
     void buyMedicine(String medicine);
     Disease saveDisease(Disease disease);
     Medicine saveMedicine(Medicine medicine);

@@ -137,6 +137,19 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
+    public Treatment updateTreatment(String description, Long price, Long id) {
+        Treatment treatment = treatmentRepository.findTreatmentById(id);
+        if (treatment == null) {
+            throw new NotFoundException("Could not find treatment with id: " + id);
+        }
+
+        treatment.setDescription(description);
+        treatment.setPrice(price);
+        treatment.setEndDate(new Date());
+        return treatment;
+    }
+
+    @Override
     @Transactional(propagation = Propagation.NEVER, readOnly = true, isolation = Isolation.SERIALIZABLE)
     public void buyMedicine(String medicineName) {
 
@@ -234,7 +247,6 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Scheduled(fixedDelay = 60000 * 60 * 12, initialDelay = 60000 * 60 * 12) // every 12 hours
     public void evictAllCaches() {
-
         List<String> caches = Arrays.asList("all-medicine", "treatment-by-disease",
                 "treatment-by-user", "all-treatment", "all-medicine");
         caches.forEach(cacheName -> {

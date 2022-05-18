@@ -135,4 +135,11 @@ public class MedicineController {
         return new ResponseEntity<>(medicineService.exportTreatment(), header, HttpStatus.OK);
     }
 
+    @PutMapping("/finishTreatment/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('doctor')")
+    public ResponseEntity<Treatment> finishTreatment(@PathVariable Long id, @RequestBody String description, @RequestParam Long price) {
+        return new ResponseEntity<>(medicineService.updateTreatment(description, price, id), HttpStatus.OK);
+    }
+
 }
