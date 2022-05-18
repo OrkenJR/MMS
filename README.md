@@ -112,3 +112,24 @@ curl --location --request POST 'localhost:8080/medicine/getTreatment' \
 curl --location --request POST 'localhost:8080/medicine/buyMedicine?medicineName=Aspirin' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Basic Y3VzdG9tZXI6dGVzdA=='
+
+### Exporting users
+curl --location --request GET 'localhost:8080/users/list/excel' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic YWRtaW46dGVzdA=='
+
+###Exporting medicines
+curl --location --request GET 'localhost:8080/medicine/list/excel' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic YWRtaW46dGVzdA=='
+
+### Exporting diseases
+curl --location --request GET 'localhost:8080/medicine/listDisease/excel' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic YWRtaW46dGVzdA=='
+
+### Exporting treatments
+curl --location --request GET 'localhost:8080/medicine/listTreatment/excel' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic YWRtaW46dGVzdA=='
+

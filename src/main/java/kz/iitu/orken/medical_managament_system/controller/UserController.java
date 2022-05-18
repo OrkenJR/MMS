@@ -3,7 +3,10 @@ package kz.iitu.orken.medical_managament_system.controller;
 import kz.iitu.orken.medical_managament_system.entity.user.User;
 import kz.iitu.orken.medical_managament_system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -60,6 +63,16 @@ public class UserController {
         User user = service.findById(userId);
         Optional.ofNullable(user).ifPresent(u -> service.deleteRole(u, roles));
         return new ResponseEntity<>(String.format("Successfully deleted roles %s from user: %s ", roles, Optional.ofNullable(user).map(User::getUsername).orElse("null")), HttpStatus.OK);
+    }
+
+    @GetMapping("/list/excel")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<ByteArrayResource> exportUsers() {
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "force-download"));
+        header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=users.xlsx");
+        return new ResponseEntity<>(service.export(), header, HttpStatus.OK);
     }
 
 }

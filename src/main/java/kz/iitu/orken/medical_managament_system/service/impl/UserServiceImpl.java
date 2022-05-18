@@ -2,7 +2,6 @@ package kz.iitu.orken.medical_managament_system.service.impl;
 
 import kz.iitu.orken.medical_managament_system.Exception.NotAllowedException;
 import kz.iitu.orken.medical_managament_system.Exception.TransactionException;
-import kz.iitu.orken.medical_managament_system.entity.Treatment;
 import kz.iitu.orken.medical_managament_system.entity.user.Role;
 import kz.iitu.orken.medical_managament_system.entity.user.User;
 import kz.iitu.orken.medical_managament_system.repository.RoleRepository;
@@ -13,6 +12,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,13 +30,15 @@ public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
     private RoleRepository roleRepository;
+    private ExcelService excelService;
     private CacheManager cacheManager;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CacheManager cacheManager) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CacheManager cacheManager, ExcelService excelService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.cacheManager = cacheManager;
+        this.excelService = excelService;
     }
 
     @Override
@@ -108,7 +111,7 @@ public class UserServiceImpl implements UserService {
             rollbackFor = TransactionException.class,
             noRollbackForClassName = {"NullpointerException", "NotAllowedException", "RuntimeException"})
     public void delete(User user) {
-        if(user!=null){
+        if (user != null) {
             userRepository.delete(user);
         }
     }
@@ -136,8 +139,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public byte[] export() {
-        return new byte[0];
+    public ByteArrayResource export() {
+        ByteArrayOutputStream stream;
+        try {
+            stream = excelService.exportUsers(findAll());
+        } catch (Exception e) {
+            stream = new ByteArrayOutputStream();
+        }
+        return new ByteArrayResource(stream.toByteArray());
     }
 
     public boolean containsName(final Set<Role> list, final String name) {

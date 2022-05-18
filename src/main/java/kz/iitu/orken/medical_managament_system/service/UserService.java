@@ -4,6 +4,7 @@ import kz.iitu.orken.medical_managament_system.entity.Treatment;
 import kz.iitu.orken.medical_managament_system.entity.user.Role;
 import kz.iitu.orken.medical_managament_system.entity.user.User;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.ByteArrayResource;
 
 import java.util.List;
 
@@ -19,6 +20,6 @@ public interface UserService {
     void deleteById(Long id);
     void deleteRole(User user, List<String> roles);
     void report(String message);
-    byte[] export();
+    ByteArrayResource export();
 
 }

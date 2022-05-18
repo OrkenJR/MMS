@@ -4,6 +4,7 @@ import kz.iitu.orken.medical_managament_system.entity.Disease;
 import kz.iitu.orken.medical_managament_system.entity.Medicine;
 import kz.iitu.orken.medical_managament_system.entity.Treatment;
 import kz.iitu.orken.medical_managament_system.entity.user.User;
+import org.springframework.core.io.ByteArrayResource;
 
 import java.util.List;
 
@@ -24,9 +25,9 @@ public interface MedicineService {
     void deleteMedicine(Long medicine);
 
     boolean isTreatmentFinished(Treatment treatment);
-    byte[] exportTreatment();
-    byte[] exportMedicine();
-    byte[] exportDisease();
+    ByteArrayResource exportTreatment();
+    ByteArrayResource exportMedicine();
+    ByteArrayResource exportDisease();
     List<User> findUsersByDisease(Disease disease);
 
 

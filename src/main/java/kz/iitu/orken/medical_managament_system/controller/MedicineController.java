@@ -6,7 +6,10 @@ import kz.iitu.orken.medical_managament_system.entity.Treatment;
 import kz.iitu.orken.medical_managament_system.service.MedicineService;
 import kz.iitu.orken.medical_managament_system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -100,6 +103,36 @@ public class MedicineController {
     public ResponseEntity<String> buyMedicine(@RequestParam String medicineName) {
         medicineService.buyMedicine(medicineName);
         return new ResponseEntity<>("You bought a medicine: " + medicineName, HttpStatus.OK);
+    }
+
+    @GetMapping("/list/excel")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<ByteArrayResource> exportMedicine() {
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "force-download"));
+        header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=medicineList.xlsx");
+        return new ResponseEntity<>(medicineService.exportMedicine(), header, HttpStatus.OK);
+    }
+
+    @GetMapping("/listDisease/excel")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<ByteArrayResource> exportDisease() {
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "force-download"));
+        header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=diseaseList.xlsx");
+        return new ResponseEntity<>(medicineService.exportDisease(), header, HttpStatus.OK);
+    }
+
+    @GetMapping("/listTreatment/excel")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<ByteArrayResource> exportTreatment() {
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "force-download"));
+        header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=treatmentList.xlsx");
+        return new ResponseEntity<>(medicineService.exportTreatment(), header, HttpStatus.OK);
     }
 
 }

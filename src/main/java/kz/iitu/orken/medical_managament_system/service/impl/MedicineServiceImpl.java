@@ -18,12 +18,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,7 @@ public class MedicineServiceImpl implements MedicineService {
     private TreatmentRepository treatmentRepository;
     private UserService userService;
     private CacheManager cacheManager;
+    private ExcelService excelService;
 
     @Value("#{new Long('${scheduling.initial-delay-rate}') * 10}")
     private Long delayRate;
@@ -42,12 +45,13 @@ public class MedicineServiceImpl implements MedicineService {
     @Autowired
     public MedicineServiceImpl(DiseaseRepository diseaseRepository, MedicineRepository medicineRepository,
                                TreatmentRepository treatmentRepository, UserService userService,
-                               CacheManager cacheManager) {
+                               CacheManager cacheManager, ExcelService excelService) {
         this.diseaseRepository = diseaseRepository;
         this.medicineRepository = medicineRepository;
         this.treatmentRepository = treatmentRepository;
         this.userService = userService;
         this.cacheManager = cacheManager;
+        this.excelService = excelService;
     }
 
     @Override
@@ -186,18 +190,36 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
-    public byte[] exportTreatment() {
-        return new byte[0];
+    public ByteArrayResource exportTreatment() {
+        ByteArrayOutputStream stream;
+        try {
+            stream = excelService.exportTreatment(findAllTreatment());
+        } catch (Exception e) {
+            stream = new ByteArrayOutputStream();
+        }
+        return new ByteArrayResource(stream.toByteArray());
     }
 
     @Override
-    public byte[] exportMedicine() {
-        return new byte[0];
+    public ByteArrayResource exportMedicine() {
+        ByteArrayOutputStream stream;
+        try {
+            stream = excelService.exportMedicine(findAllMedicine());
+        } catch (Exception e) {
+            stream = new ByteArrayOutputStream();
+        }
+        return new ByteArrayResource(stream.toByteArray());
     }
 
     @Override
-    public byte[] exportDisease() {
-        return new byte[0];
+    public ByteArrayResource exportDisease() {
+        ByteArrayOutputStream stream;
+        try {
+            stream = excelService.exportDisease(findAllDisease());
+        } catch (Exception e) {
+            stream = new ByteArrayOutputStream();
+        }
+        return new ByteArrayResource(stream.toByteArray());
     }
 
     @Override
