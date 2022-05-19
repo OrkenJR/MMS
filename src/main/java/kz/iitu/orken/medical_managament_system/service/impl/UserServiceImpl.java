@@ -33,6 +33,9 @@ public class UserServiceImpl implements UserService {
     private ExcelService excelService;
     private CacheManager cacheManager;
 
+    public UserServiceImpl() {
+    }
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CacheManager cacheManager, ExcelService excelService) {
         this.userRepository = userRepository;
